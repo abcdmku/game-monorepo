@@ -17,7 +17,7 @@
         "polyfills": "apps/game-mr/src/polyfills.ts",
         "tsConfig": "apps/game-mr/tsconfig.app.json",
         "assets": ["apps/game-mr/src/favicon.ico", "apps/game-mr/src/assets"],
-        "styles": ["apps/game-mr/src/styles.css"],
+        "styles": ["dist/bootstrap.min.css"],
         "scripts": [],
         "webpackConfig": "@nrwl/react/plugins/webpack"
       },

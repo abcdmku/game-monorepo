@@ -14,7 +14,12 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@game-mr/core-components": ["libs/core-components/src/index.ts"],
+      "@game-mr/game/area": ["libs/game/area/src/index.ts"],
+      "@game-mr/game/number-game": ["libs/game/number-game/src/index.ts"],
+      "@game-mr/helpers": ["libs/helpers/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
