@@ -14,6 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "noImplicitAny": false,
     "paths": {
       "@game-mr/core-components": ["libs/core-components/src/index.ts"],
       "@game-mr/game/area": ["libs/game/area/src/index.ts"],

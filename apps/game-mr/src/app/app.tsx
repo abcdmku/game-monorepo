@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
-import { Button, Form, InputGroup } from 'react-bootstrap';
+import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Lobby, JoinLobby} from '@game-mr/core-components';
 import { Area } from '@game-mr/game/area'
+import { useLocalStorage, User } from '@game-mr/helpers';
 
 export function App() {
-  const [userName, setUserName] = useState<string>();
+  const [user, setUser] = useLocalStorage("user", {});
 
-  return !userName ? (
-      <JoinLobby onSubmit={(u) => setUserName(u)}/>
+  return Object.keys(user).length === 0 ? (
+      <JoinLobby onSubmit={(u) => setUser(u)}/>
     ) : (
       <div style={{ height: '100vh', overflow: 'hidden' }}>
         <Routes>
-          <Route path="/" element={<Lobby userName={`${userName}`}/>}/>
-          <Route path="/area" element={<Area userName={`${userName}`}/>}/>
+          <Route path="/" element={<Lobby user={user as User}/>}/>
+          <Route path="/area" element={<Area user={user as User}/>}/>
         </Routes>
       </div>
     )

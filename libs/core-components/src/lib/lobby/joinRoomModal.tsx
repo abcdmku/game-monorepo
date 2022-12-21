@@ -1,31 +1,64 @@
+import { User, useSocket } from '@game-mr/helpers';
+import { useState, useEffect } from 'react';
 import { Modal, Stack, Button, ModalProps } from 'react-bootstrap';
+import { Socket } from 'socket.io-client';
 import { RoomRow } from './roomRow';
-
-const randomInt = (max: number) => Math.floor(Math.random() * max);
+import { RoomData } from './serverLogic';
 
 interface JoinRoomModalProps extends ModalProps {
-  gameTitle: string;
-  roomData: object;
+  game: string;
+  user: User;
 }
 
 export const JoinRoomModal = ({
-  gameTitle,
-  roomData,
+  game,
+  user,
   ...props
-}: JoinRoomModalProps) => (
-  <Modal {...props}>
-    <Modal.Header closeButton className="bg-dark" closeVariant="white">
-      <Modal.Title>Join or create a room for {gameTitle}</Modal.Title>
-    </Modal.Header>
-    <Modal.Body className="bg-dark">
-      <Stack gap={1}>
-        {[...Array(randomInt(8) + 2)].map(() => (
-          <RoomRow />
-        ))}
-      </Stack>
-    </Modal.Body>
-    <Modal.Footer className="bg-dark">
-      <Button>Make Room</Button>
-    </Modal.Footer>
-  </Modal>
-);
+}: JoinRoomModalProps) => {
+  const [socket, setSocket] = useState<Socket>();
+  const [rooms, setRooms] = useState<RoomData[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  
+  const clientLogic = (socket:Socket) => {
+    socket.on('rooms', (r) => (setRooms(r), console.log(r)));
+    socket.on('connect', () => { setIsConnected(true); });
+    socket.on('disconnect', () => { setIsConnected(false) });
+    socket.on("connect_error", (err) => {
+      console.log(err instanceof Error);
+      console.log(err.message);
+    });
+  }
+
+  const joinRoom = (game, joinAsPlayer) => socket?.emit('joinRoom', {game: game, joinAsPlayer: joinAsPlayer})
+
+  useEffect(() => {
+    const socket = useSocket({
+      user: user,
+      nameSpace: game,
+      logic: (socket) => clientLogic(socket)
+    })
+    setSocket(socket)
+  }, []);
+
+  return (
+    <Modal {...props} centered>
+      <Modal.Header closeButton className="bg-dark" closeVariant="white">
+        <Modal.Title>Join or create a room.</Modal.Title>
+      </Modal.Header>
+      <Modal.Body className="bg-dark">
+        <Stack gap={1}>
+          {rooms?.length ? 
+          rooms.map(r => (
+            <RoomRow roomData={r}/>
+          )) :
+          <div>Be the first to make a room!</div>
+        }
+        </Stack>
+      </Modal.Body>
+      <Modal.Footer className="bg-dark">
+      <h6 className={`ms-2 ${isConnected ? 'text-success' : 'text-danger'}`}>Connected: {String(isConnected)}</h6>
+        <Button onClick={() => joinRoom(game,true)}>Make Room</Button>
+      </Modal.Footer>
+    </Modal>
+  )
+};

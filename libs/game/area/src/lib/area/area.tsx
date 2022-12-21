@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { Chat } from '@game-mr/core-components';
+import { User } from 'libs/helpers/src/types';
 
-export function Area({ userName }: { userName: string }) {
+export function Area({ user }: { user: User }) {
   const [socket, setSocket] = useState<Socket>();
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     if (!socket) {
-      const socket = io('http://localhost:3000/area', {query: { userName: userName }});
+      const socket = io('http://localhost:3000/area', {query: { user: user }});
       setSocket(socket);
 
     }
@@ -39,7 +40,7 @@ export function Area({ userName }: { userName: string }) {
       ) : (
         <div>
           <div className="fixed-bottom">
-            <Chat userName={userName} socket={socket} />
+            <Chat userName={user.name} socket={socket} />
           </div>
         </div>
       )}
