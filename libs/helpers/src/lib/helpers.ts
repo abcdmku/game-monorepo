@@ -8,7 +8,7 @@ interface useSocketProps {
 }
 
 export const useSocket = ({ user, nameSpace, logic}: useSocketProps): Socket => {
-  const socket = io('http://localhost:3000/' + nameSpace, {query: { user: user }});
+  const socket = io('http://localhost:3000/' + nameSpace, { auth: user });
   socket.on('connect_error', (err) => {
     console.log(err instanceof Error);
     console.log(err.message);

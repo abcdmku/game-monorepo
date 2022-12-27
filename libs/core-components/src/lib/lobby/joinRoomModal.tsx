@@ -23,10 +23,7 @@ export const JoinRoomModal = ({
     socket.on('rooms', (r) => (setRooms(r), console.log(r)));
     socket.on('connect', () => { setIsConnected(true); });
     socket.on('disconnect', () => { setIsConnected(false) });
-    socket.on("connect_error", (err) => {
-      console.log(err instanceof Error);
-      console.log(err.message);
-    });
+    
   }
 
   const joinRoom = (game, joinAsPlayer) => socket?.emit('joinRoom', {game: game, joinAsPlayer: joinAsPlayer})

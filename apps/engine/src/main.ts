@@ -21,7 +21,7 @@ export type Socket = SocketType<DefaultEventsMap, DefaultEventsMap, DefaultEvent
 const randomString = (int) => (Math.random() + 1).toString(36).substring(7);
 
 const Games = [
-  {name: '', logic: null},
+  {name: '/', logic: null},
   {name: 'lobby', logic: LobbyLogic},
   {name: 'area', logic: null}
 ]
@@ -31,6 +31,8 @@ let users: User[] = [];
 export const validUserName = (name) => /^([a-zA-Z0-9_-]){1,10}$/.test(name);
 export const uniqueUserName = (name) => !users.some(u => u.name === name);
 
+const isEqual = (...objects) => objects.every((obj) => JSON.stringify(obj) === JSON.stringify(objects[0]));
+
 
 Games.map(gameInfo =>{
   const game = io.of(gameInfo.name);
@@ -39,40 +41,42 @@ Games.map(gameInfo =>{
   let nsUsers: string[] = [];
   
   game.use((socket, next) => {
-    const userName = socket.handshake.query.userName as string;
+    const requestedUser = socket.handshake.auth;
+    console.log('requestedUser', requestedUser);
+    if(!validUserName(requestedUser.name)) return new Error("Username must be 1 to 10 alphanumeric characters long");
+    if(!uniqueUserName(requestedUser.name)) return new Error("User already exists");
 
-    if(!validUserName(userName)) return next(new Error("Username must be 1 to 10 alphanumeric characters long"));
-    if(!uniqueUserName(userName)) return next(new Error("User already exists"));
-
-    socket.data.userName = userName;
-    const user = {name: userName, id:socket.id, token: randomString(3)}
+    const user = {name:requestedUser.name, id: socket.id, token:randomString(4)}
     users.push(user);
+    game.emit('users',nsUsers)
     next();
   });
   
   
   game.on('connection', (socket) => {
-      const userName = socket.data.userName
-      const user = {name: userName, id:socket.id, token: randomString(3)}
-      nsUsers.push(user.name);
-      game.emit('users',nsUsers)
-      game.emit('message', messages)
 
-  
-    socket.on("disconnect", () => {
-      users = users.filter(user => user.name !== userName)
-      nsUsers = nsUsers.filter(user => user !== userName)
-      game.emit('users',nsUsers)
-    });
-  
-    socket.on("message", (incomingMsg) => {
-      const message: Message = {name: userName, message: incomingMsg}
-      messages.unshift(message);
-      game.emit('message', messages)
+    socket.on("login", (user:User, callback) => {
+
     });
 
-    game.name !== 'lobby' && LobbyLogic(game, socket);
+    const user = socket.data.user;
+    if(false){
+    
+      socket.on("disconnect", () => {
+        users = users.filter(u => u.name !== user.name)
+        nsUsers = nsUsers.filter(u => u !== user.name)
+        game.emit('users',nsUsers)
+      });
+    
+      socket.on("message", (incomingMsg) => {
+        const message: Message = {name: user.name, message: incomingMsg}
+        messages.unshift(message);
+        game.emit('message', messages)
+      });
 
-    gameInfo.logic && gameInfo.logic(game, socket); 
+      game.name !== 'lobby' && LobbyLogic(game, socket);
+
+      gameInfo.logic && gameInfo.logic(game, socket); 
+    }
   })
 })
