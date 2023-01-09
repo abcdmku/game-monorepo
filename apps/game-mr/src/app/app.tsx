@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Lobby, JoinLobby} from '@game-mr/core-components';
 import { Area } from '@game-mr/game/area'
@@ -6,9 +6,17 @@ import { useLocalStorage, User } from '@game-mr/helpers';
 import { Button } from 'react-bootstrap';
 
 export function App() {
-  const [user, setUser] = useLocalStorage("user", {});
+  const [user, setUser] = useLocalStorage("user", {name: ''});
 
-  return Object.keys(user).length === 0 ? (
+  useEffect(() => {
+    !user && setUser({});
+  }, []);
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+  
+  return user && Object.keys(user).length === 0 ? (
       <JoinLobby onLogin={(u) => setUser(u)}/>
     ) : (
       <div style={{ height: '100vh', overflow: 'hidden' }}>

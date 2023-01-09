@@ -18,7 +18,7 @@ export type ServerIO = Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsM
 export type Game = Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
 export type Socket = SocketType<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 
-const randomString = (int) => (Math.random() + 1).toString(36).substring(7);
+const randomString = (int) => Array.from(Array(int), () => Math.floor(Math.random() * 36).toString(36)).join('');
 
 const Games = [
   {name: '/', logic: null},
@@ -30,6 +30,7 @@ let users: User[] = [];
 
 export const validUserName = (name) => /^([a-zA-Z0-9_-]){1,10}$/.test(name);
 export const uniqueUserName = (name) => !users.some(u => u.name === name);
+const userLoggedIn = (user:User) => users.filter(u => isEqual(u,user));
 
 const isEqual = (...objects) => objects.every((obj) => JSON.stringify(obj) === JSON.stringify(objects[0]));
 
@@ -41,25 +42,33 @@ Games.map(gameInfo =>{
   let nsUsers: string[] = [];
   
   game.use((socket, next) => {
-    const requestedUser = socket.handshake.auth;
-    console.log('requestedUser', requestedUser);
-    if(!validUserName(requestedUser.name)) return new Error("Username must be 1 to 10 alphanumeric characters long");
-    if(!uniqueUserName(requestedUser.name)) return new Error("User already exists");
+    const requestedUser = socket.handshake.auth as User;
 
-    const user = {name:requestedUser.name, id: socket.id, token:randomString(4)}
-    users.push(user);
-    game.emit('users',nsUsers)
+    if(requestedUser?.token) {
+      const loggedin = userLoggedIn(requestedUser);
+      console.log('uloggedin', loggedin)
+      //if(!validUserName(requestedUser.name)) return new Error("Username must be 1 to 10 alphanumeric characters long");
+    } else {
+      if(!validUserName(requestedUser.name)) return new Error("Username must be 1 to 10 alphanumeric characters long");
+      if(!uniqueUserName(requestedUser.name)) return new Error("User already exists");
+  
+      const user = {name:requestedUser.name, id: socket.id, token:randomString(20)}
+      socket.data.user = user
+
+      users.push(user);
+    }
+
+    game.emit('users', nsUsers)
     next();
   });
   
   
   game.on('connection', (socket) => {
+    const user = socket.data.user as User;
 
-    socket.on("login", (user:User, callback) => {
+      game.emit('joined', user)
+    
 
-    });
-
-    const user = socket.data.user;
     if(false){
     
       socket.on("disconnect", () => {
