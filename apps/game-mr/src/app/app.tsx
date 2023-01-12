@@ -9,7 +9,7 @@ export function App() {
   const [user, setUser] = useState<User>({} as User);
 
   useEffect(() => {
-    console.log(user);
+    console.log("user", user);
   }, [user]);
   
   return user && user?.name === undefined ? (

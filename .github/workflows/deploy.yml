@@ -22,14 +22,17 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - run: npm i
       - run: npm run build
-
+      
       - uses: a7ul/tar-action@v1.1.0
         with:
           command: c
           cwd: "./"
           files: |
-            dist/
+            package.json
+            Dockerfile
+            dist/apps/game-mr
             captain-definition
           outPath: deploy.tar
 
@@ -37,5 +40,23 @@ jobs:
         uses: caprover/deploy-from-github@v1.0.1
         with:
           server: '${{ secrets.CAPROVER_SERVER }}'
-          app: '${{ secrets.APP_NAME }}'
-          token: '${{ secrets.APP_TOKEN }}'
+          app: 'games'
+          token: 'e316ba5950861c76165336fdecaabcdaff3b2abb7da6704e2067e7e68b72dc66'
+
+
+      - uses: a7ul/tar-action@v1.1.0
+        with:
+          command: c
+          cwd: "./"
+          files: |
+            package.json
+            dist/apps/engine
+            captain-definition
+          outPath: deploy.tar
+
+      - name: Deploy App to CapRover
+        uses: caprover/deploy-from-github@v1.0.1
+        with:
+          server: '${{ secrets.CAPROVER_SERVER }}'
+          app: 'node'
+          token: 'ada4af29097a50feeeee997fa30cb1c1a03d5a426b871b558a837a5de84db969'
