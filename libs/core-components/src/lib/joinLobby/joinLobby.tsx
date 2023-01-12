@@ -1,9 +1,9 @@
-import { useSocket } from "@game-mr/helpers";
+import { User, useSocket } from "@game-mr/helpers";
 import { useState } from "react";
 import { Form, InputGroup, Button } from "react-bootstrap";
 import { Socket } from "socket.io-client";
 
-export const JoinLobby = ({ onLogin}: { onLogin: (x: string) => void }) => {
+export const JoinLobby = ({ onLogin}: { onLogin: (x: User) => void }) => {
     const [userName, setUserName] = useState<string>('');
     const [isConnected, setIsConnected] = useState(false);
     

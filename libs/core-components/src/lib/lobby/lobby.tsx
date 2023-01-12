@@ -53,7 +53,7 @@ export function Lobby({user}:{user:User}) {
       </Container>
       <div className='fixed-bottom'>
         <h6 className={`ms-2 ${isConnected ? 'text-success' : 'text-danger'}`}>Connected: {String(isConnected)}</h6>
-        <Chat userName={user.name} socket={socket}/>
+        <Chat userName={user?.name} socket={socket}/>
       </div>
       <JoinRoomModal 
         show={showModal}

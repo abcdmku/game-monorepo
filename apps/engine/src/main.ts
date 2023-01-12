@@ -69,7 +69,7 @@ Games.map(gameInfo =>{
       game.emit('joined', user)
     
 
-    if(false){
+    if(true){
     
       socket.on("disconnect", () => {
         users = users.filter(u => u.name !== user.name)
