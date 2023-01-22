@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve",
-    "build": "nx build",
+    "build": "nx affected:build --all",
     "test": "nx test"
   },
   "private": true,
@@ -39,7 +39,6 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "jest": "28.1.1",
     "jest-environment-jsdom": "28.1.1",
-    "nx": "15.3.0",
     "prettier": "^2.6.2",
     "react-bootstrap": "^2.7.0",
     "react-refresh": "^0.10.0",
@@ -50,6 +49,7 @@
     "url-loader": "^4.1.1"
   },
   "dependencies": {
+    "nx": "15.3.0",
     "@socket.io/admin-ui": "^0.5.1",
     "core-js": "^3.6.5",
     "react": "18.2.0",
