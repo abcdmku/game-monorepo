@@ -2,35 +2,40 @@ import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { Chat } from '@game-mr/core-components';
 import { User } from 'libs/helpers/src/types';
+import { useLocation } from 'react-router-dom';
+import { useSocket } from '@game-mr/helpers';
 
 export function Area({ user }: { user: User }) {
   const [socket, setSocket] = useState<Socket>();
   const [isConnected, setIsConnected] = useState(false);
+  const { pathname } = useLocation()
+  const [ room ] = useState<string>(`${pathname.split('/').pop()}`)
 
   useEffect(() => {
     if (!socket) {
       const socket = io('http://localhost:3000/area', {query: { user: user }});
       setSocket(socket);
-
     }
+    console.log(room)
+  }, []);
+
+  const clientLogic = (socket:Socket) => {
+    socket.on('connect', () => { setIsConnected(true); });
+    socket.on('disconnect', () => { setIsConnected(false) });
+  }
+
+  useEffect(() => {
+    const socket = useSocket({
+      user: user,
+      nameSpace: 'area',
+      logic: (socket) => clientLogic(socket)
+    })
+    setSocket(socket)
   }, []);
 
   useEffect(() => {
-    if(socket && !isConnected) {
-      socket.on('connect', () => { setIsConnected(true); });
-      socket.on('disconnect', () => { setIsConnected(false) });
-      socket.on("connect_error", (err) => {
-        console.log(err instanceof Error);
-        console.log(err.message);
-      });
-
-      return () => {
-        socket.off('connect');
-        socket.off('disconnect');
-        socket.off('connect_error');
-      };
-    }
-  }, [socket]);
+    socket?.emit('joinRoom', { joinAsPlayer: true});
+  }, [room]);
 
   return (
     <div style={{ height: '100vh', overflow: 'hidden' }}>
@@ -40,7 +45,7 @@ export function Area({ user }: { user: User }) {
       ) : (
         <div>
           <div className="fixed-bottom">
-            <Chat userName={user.name} socket={socket} />
+            <Chat userName={user.name} socket={socket} room={room}/>
           </div>
         </div>
       )}

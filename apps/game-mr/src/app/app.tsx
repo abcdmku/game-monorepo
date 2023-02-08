@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Lobby, JoinLobby} from '@game-mr/core-components';
 import { Area } from '@game-mr/game/area'
 import { useLocalStorage, User } from '@game-mr/helpers';
 import { Button } from 'react-bootstrap';
+import { JoinRoomModal } from 'libs/core-components/src/lib/lobby/joinRoomModal';
 
 export function App() {
   const [user, setUser] = useState<User>({} as User);
 
-  useEffect(() => {
-    console.log("user", user);
-  }, [user]);
-  
+  const navigate = useNavigate();
+
   return user && user?.name === undefined ? (
       <JoinLobby onLogin={(u) => setUser( u as User)}/>
     ) : (
@@ -19,7 +18,12 @@ export function App() {
         <Button className='position-absolute top-0 end-0 m-3' onClick={(u) => setUser({} as User)}>Log out</Button>
         <Routes>
           <Route path="/" element={<Lobby user={user as User}/>}/>
-          <Route path="/area" element={<Area user={user as User}/>}/>
+          <Route path="/area/*" element={<Area user={user as User}/>}/>
+          <Route path="/area" element={<JoinRoomModal game='area' user={user as User} show onHide={()=>navigate('/')}/>}/>
+          <Route path="/stellcon/*" element={<Area user={user as User}/>}/>
+          <Route path="/stellcon" element={<JoinRoomModal game='stellcon' user={user as User} show onHide={()=>navigate('/')}/>}/>
+          <Route path="/number-game/*" element={<Area user={user as User}/>}/>
+          <Route path="/number-game" element={<JoinRoomModal game='number-game' user={user as User} show onHide={()=>navigate('/')}/>}/>
         </Routes>
       </div>
     )

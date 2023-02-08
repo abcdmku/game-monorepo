@@ -10,10 +10,10 @@ export interface ChatProps {
   className?: string;
 }
 
-export const Chat = ({userName, socket}:{userName:string; socket: Socket}) => {
+export const Chat = ({userName, socket, room}:{userName:string; socket: Socket, room: string;}) => {
   const [users, setUsers] = useState<User[]>([]);
   const [messages, setMessages] = useState<Message[]>([
-    { name: 'System', message: 'No messages...' },
+    {room: room, name: 'System', message: 'No messages...' },
   ]);
   
   useEffect(() => {
@@ -35,7 +35,7 @@ export const Chat = ({userName, socket}:{userName:string; socket: Socket}) => {
     <Social
       users={users}
       currentUserName={`${userName}`}
-      onSend={(msg) => socket?.emit('message', msg)}
+      onSend={(msg) => socket?.emit('message', {room: room, message:msg})}
       messages={messages}
     />
   </>

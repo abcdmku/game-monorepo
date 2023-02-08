@@ -42,7 +42,7 @@ export const JoinLobby = ({ onLogin}: { onLogin: (x: User) => void }) => {
               variant="primary"
               id="button-addon2"
             >
-              Join Lobby
+              Join
             </Button>
           </InputGroup>
         </Form>

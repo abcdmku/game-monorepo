@@ -1,6 +1,6 @@
-import { ServerSocket, Game } from "@game-mr/helpers";
+import { ServerSocket, Game, ServerIO } from "@game-mr/helpers";
 
-const randomString = () => (Math.random() + 1).toString(36).substring(7);
+const randomString = (int) => Array.from(Array(int), () => Math.floor(Math.random() * 36).toString(36)).join('');
 
 export interface RoomData {
   name: string;
@@ -8,41 +8,40 @@ export interface RoomData {
   watchers: string[];
 }
 
-export const LobbyLogic = (game:Game, socket:ServerSocket) => {
-  const getRooms = async (nameSpace) => {
-    let rooms:RoomData[] = [];
+export const LobbyLogic = (lobby:Game, socket:ServerSocket, io: ServerIO) => {
+  const getRoomData = async (gameName:string) => {
+    const rooms:RoomData[] = [];
+    const gameNameSpace = io.of(gameName);
 
-    const gameRooms = await game.adapter.rooms;
+    const gameRooms = await gameNameSpace.adapter.rooms;
     for await (const [roomName] of gameRooms) {
-      if(roomName.split('/')[0] === nameSpace) {
-        const players: string[] = [];
-        const watchers: string[] = [];
-        game.in(roomName).fetchSockets().then(async sockets => {
-          sockets.forEach(async s => {
-            const isPlayer = s.data.playing?.includes(roomName);
-            isPlayer ? players.push(s.data.userName) : watchers.push(s.data.userName);
-          })
+      const players: string[] = [];
+      const watchers: string[] = [];
+      lobby.in(roomName).fetchSockets().then(async sockets => {
+        sockets.forEach(async s => {
+          const isPlayer = s.data.playing?.includes(roomName);
+          isPlayer ? players.push(s.data.userName) : watchers.push(s.data.userName);
         })
-        rooms.push({ name: roomName, players: players, watchers: watchers });
-      }
+      })
+      rooms.push({ name: roomName, players: players, watchers: watchers });
     }
     return rooms;
   }
 
   socket.on(('joinRoom'), async ({game: gameName, room, joinAsPlayer}) => {
-    const name = `${gameName}/${ room ?  room : randomString() }`;
+
+    const name = room ?  room : randomString(4);
     if(joinAsPlayer) {
       const roomsAsPlayer = socket.data.playing?.length ? socket.data.playing : []
       socket.data.playing = [...roomsAsPlayer, name]
     }
-    socket.join(name);
-    console.log('join', await getRooms(gameName))
-    game.emit('rooms', await getRooms(gameName));
+    socket.emit('joinRoom', `/${gameName}/${name}`);
+    console.log('join', `/${gameName}/${name}`)
+    lobby.emit(socket.id, " joining room ", `/${gameName}/${name}`);
 
   });
 
   socket.on('getRooms', async (game) => {
-    console.log( await getRooms(game))
-    socket.emit('rooms', await getRooms(game));
+    socket.emit('rooms', await getRoomData(game));
   });
 }

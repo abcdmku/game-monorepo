@@ -23,22 +23,35 @@ export const JoinRoomModal = ({
     socket.on('rooms', (r) => (setRooms(r), console.log(r)));
     socket.on('connect', () => { setIsConnected(true); });
     socket.on('disconnect', () => { setIsConnected(false) });
-    
   }
 
-  const joinRoom = (game, joinAsPlayer) => socket?.emit('joinRoom', {game: game, joinAsPlayer: joinAsPlayer})
+  interface joinRoomProps {
+    room?: null | string;
+    joinAsPlayer?: boolean;
+  }
+
+  const joinRoom = ({room = null, joinAsPlayer}:joinRoomProps) => socket?.emit('joinRoom', {room: room, joinAsPlayer: joinAsPlayer})
+  const getRooms = () => socket?.emit('getRooms', game)
 
   useEffect(() => {
+    console.log(game)
     const socket = useSocket({
       user: user,
       nameSpace: game,
       logic: (socket) => clientLogic(socket)
     })
     setSocket(socket)
-  }, []);
+    getRooms();
+
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('pong');
+    };
+  }, [game]);
 
   return (
-    <Modal {...props} centered>
+    <Modal {...props} centered backdrop={props.backdrop ? props.backdrop :'static'}>
       <Modal.Header closeButton className="bg-dark" closeVariant="white">
         <Modal.Title>Join or create a room.</Modal.Title>
       </Modal.Header>
@@ -53,8 +66,8 @@ export const JoinRoomModal = ({
         </Stack>
       </Modal.Body>
       <Modal.Footer className="bg-dark">
-      <h6 className={`ms-2 ${isConnected ? 'text-success' : 'text-danger'}`}>Connected: {String(isConnected)}</h6>
-        <Button onClick={() => joinRoom(game,true)}>Make Room</Button>
+      <h6 className={`ms-2 ${isConnected ? 'text-success' : 'text-danger'}`}>Connected to {game}: {String(isConnected)}</h6>
+        <Button onClick={() => joinRoom({joinAsPlayer: true})}>Make Room</Button>
       </Modal.Footer>
     </Modal>
   )

@@ -11,7 +11,7 @@ export const RoomRow = ({roomData}:{roomData:RoomData}) => (
       className="text-start font-monospace"
       style={{ width: '80px' }}
     >
-      #{roomData.name.split('/')[1]}
+      {roomData.name}
     </Button>
     <Stack direction="horizontal" gap={2}>
       <ImUser />
