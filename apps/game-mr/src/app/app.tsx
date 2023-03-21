@@ -5,6 +5,7 @@ import { Area } from '@game-mr/game/area'
 import { User } from '@game-mr/helpers';
 import { Button } from 'react-bootstrap';
 import { JoinRoomModal } from 'libs/core-components/src/lib/lobby/joinRoomModal';
+import { NumberGame } from '@game-mr/game/number-game';
 
 export function App() {
   const [user, setUser] = useState<User>({} as User);
@@ -39,7 +40,7 @@ export function App() {
           <Route path="/area" element={<JoinRoomModal game='area' user={user as User} show onHide={()=>navigate('/')}/>}/>
           <Route path="/stellcon/*" element={<Area user={user as User}/>}/>
           <Route path="/stellcon" element={<JoinRoomModal game='stellcon' user={user as User} show onHide={()=>navigate('/')}/>}/>
-          <Route path="/number-game/*" element={<Area user={user as User}/>}/>
+          <Route path="/number-game/*" element={<NumberGame user={user as User}/>}/>
           <Route path="/number-game" element={<JoinRoomModal game='number-game' user={user as User} show onHide={()=>navigate('/')}/>}/>
         </Routes>
       </div>

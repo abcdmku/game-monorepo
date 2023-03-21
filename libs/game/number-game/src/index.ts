@@ -1,2 +1,2 @@
-export * from './lib/number-game/number-game';
-export * from './lib/game-icon/game-icon';
+export * from './lib';
+export * from './lib/game-details';

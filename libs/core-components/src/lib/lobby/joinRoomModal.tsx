@@ -33,7 +33,7 @@ export const JoinRoomModal = ({
     joinAsPlayer?: boolean;
   }
 
-  const joinRoom = ({room, joinAsPlayer}:joinRoomProps) => navigate(`/area/${room ? room : randomString(4)}${joinAsPlayer ? '' : '?watching=true'}`)
+  const joinRoom = ({room, joinAsPlayer}:joinRoomProps) => navigate(`/${game}/${room ? room : randomString(4)}${joinAsPlayer ? '' : '?watching=true'}`)
 
   const getRooms = () => socket?.emit('getRooms', game)
 
