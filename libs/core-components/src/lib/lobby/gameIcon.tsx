@@ -1,19 +1,23 @@
 import { Card } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 interface gameIconProps {
   icon?: JSX.Element;
   children?: JSX.Element | JSX.Element[];
   title: string;
-  onClick: Function;
 }
 
-export const GameIcon = ({ children, title, onClick, icon }: gameIconProps) => {
+const titleToNS = (str:string) => '/' + str.replace(/\W+/g, '-').toLowerCase();
+
+export const GameIcon = ({ children, title, icon }: gameIconProps) => {
+  const navigate = useNavigate();
+
   return (
     <Card
       role="button"
       className="game-card border-dark rounded-3 text-center m-4"
       style={{ width: '120px', height: '120px' }}
-      onClick={() => onClick()}
+      onClick={() => navigate(titleToNS(title))}
     >
       {children}
       {icon}

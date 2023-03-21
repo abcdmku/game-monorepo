@@ -14,7 +14,6 @@ export const JoinLobby = ({ onLogin}: { onLogin: (x: User) => void }) => {
         console.log(err instanceof Error);
         console.log(err.message);
       });
-
     }
 
     const handleLogin = (e, userName) => {

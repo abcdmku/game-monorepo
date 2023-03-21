@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Lobby, JoinLobby} from '@game-mr/core-components';
 import { Area } from '@game-mr/game/area'
-import { useLocalStorage, User } from '@game-mr/helpers';
+import { User } from '@game-mr/helpers';
 import { Button } from 'react-bootstrap';
 import { JoinRoomModal } from 'libs/core-components/src/lib/lobby/joinRoomModal';
 
@@ -24,7 +24,7 @@ export function App() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
     setUser({} as User);
   }
 
@@ -32,7 +32,7 @@ export function App() {
       <JoinLobby onLogin={u => handleLogin(u)}/>
     ) : (
       <div style={{ height: '100vh', overflow: 'hidden' }}>
-        <Button className='position-absolute top-0 end-0 m-3' onClick={() => handleLogout()}>Log out</Button>
+        <Button className='position-absolute top-0 end-0 m-3' onClick={() => handleLogout()}>Log out {user.name}</Button>
         <Routes>
           <Route path="/" element={<Lobby user={user as User}/>}/>
           <Route path="/area/*" element={<Area user={user as User}/>}/>

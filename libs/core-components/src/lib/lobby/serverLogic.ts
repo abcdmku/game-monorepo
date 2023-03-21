@@ -28,19 +28,6 @@ export const LobbyLogic = (lobby:Game, socket:ServerSocket, io: ServerIO) => {
     return rooms;
   }
 
-  socket.on(('joinRoom'), async ({game: gameName, room, joinAsPlayer}) => {
-
-    const name = room ?  room : randomString(4);
-    if(joinAsPlayer) {
-      const roomsAsPlayer = socket.data.playing?.length ? socket.data.playing : []
-      socket.data.playing = [...roomsAsPlayer, name]
-    }
-    socket.emit('joinRoom', `/${gameName}/${name}`);
-    console.log('join', `/${gameName}/${name}`)
-    lobby.emit(socket.id, " joining room ", `/${gameName}/${name}`);
-
-  });
-
   socket.on('getRooms', async (game) => {
     socket.emit('rooms', await getRoomData(game));
   });

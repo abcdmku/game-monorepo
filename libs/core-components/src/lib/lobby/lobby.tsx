@@ -6,9 +6,10 @@ import { Chat } from '../chat/chat';
 import { Socket } from 'socket.io-client';
 import { User, useSocket } from '@game-mr/helpers';
 import {GameTitle as AreaGameTitle, GameIcon as AreaGameIcon } from '@game-mr/game/area'
+import {GameTitle as NumberGameTitle, GameIcon as NumberGameIcon } from '@game-mr/game/number-game'
+
 import { GameIcon } from './gameIcon';
-import { RoomData } from './serverLogic';
-import { useNavigate } from 'react-router-dom';
+
 
 export function Lobby({user}:{user:User}) {
   const [socket, setSocket] = useState<Socket>();
@@ -31,7 +32,6 @@ export function Lobby({user}:{user:User}) {
     };
   }, []);
 
-  const navigate = useNavigate();
 
   return !socket ? (
         <div> Joining room...</div>
@@ -40,14 +40,14 @@ export function Lobby({user}:{user:User}) {
       <h1 className="text-center mt-3">Choose a game!</h1>
       <Container>
         <div className="d-flex flex-wrap justify-content-center">
-          <GameIcon onClick={() => navigate(`/area`)}  title={AreaGameTitle} icon={<AreaGameIcon/>}/>
+          <GameIcon title={AreaGameTitle} icon={<AreaGameIcon/>}/>
 
-          <GameIcon onClick={() => navigate(`/stellcon`)} title="Stellcon">
+          <GameIcon title="Stellcon">
             <CgShapeHexagon size="3em" className="mx-auto mt-3 mb-2 text-warning"/>
           </GameIcon>
-          <GameIcon onClick={() => navigate(`/number-game`)} title='Number Game'>
-            <TbNumbers size="3em" className="mx-auto mt-3 mb-2 text-success" />
-          </GameIcon>
+
+          <GameIcon title={NumberGameTitle} icon={<NumberGameIcon/>}/>
+
         </div>
       </Container>
       <div className='fixed-bottom'>

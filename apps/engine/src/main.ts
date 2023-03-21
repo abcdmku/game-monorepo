@@ -6,7 +6,7 @@ import { LobbyLogic } from 'libs/core-components/src/lib/lobby/serverLogic';
 
 const io = new Server(3000, {
   cors: {
-    origin: [/(localhost)./, /(minerva.us)/, "https://admin.socket.io"],
+    origin: [/(localhost)./, /(minerva.us)/, "https://admin.socket.io", /()/],
     credentials: true
   },
 });
@@ -77,6 +77,10 @@ const getRoomUsers = async (game:Game, room: string) => {
   return users
 }
 
+const cleanUpUsers = () => {
+
+}
+
 Games.map(gameInfo =>{
   const game = io.of(gameInfo.name);
 
@@ -100,7 +104,7 @@ Games.map(gameInfo =>{
   game.on('connection', async (socket) => {
     const user = socket.data.user as User;
     
-    game.emit('joined', user)
+    game.to(user.id).emit('joined', user)
 
     game.emit('rooms', await getRoomData(game));
 
@@ -108,8 +112,9 @@ Games.map(gameInfo =>{
       socket.data.playing?.forEach(async (r) => {
         const message: Message = {room: r, name: 'System', message: `${user.name} left room ${r} for ${game.name}`}
         messages.unshift(message);
-        //game.emit('message', messages);
-        //game.emit('users', await getRoomUsers(game, r))
+        
+        game.emit('message', messages);
+        game.emit('users', await getRoomUsers(game, r))
       })
     });
 
