@@ -10,15 +10,14 @@ export const MessageInput = ({
 
   return (
     <Form 
-    onSubmit={(e) => (e.preventDefault(), message && onSubmit(message), e.currentTarget.reset(), setMessage(undefined))}
-
+      onSubmit={(e) => (e.preventDefault(), message && onSubmit(message), e.currentTarget.reset(), setMessage(undefined))}
     >
       <InputGroup>
         <Form.Control
           placeholder="message"
           onChange={(e) => setMessage(e.currentTarget.value)}
         />
-        <Button variant="primary" id="button-addon2">
+        <Button type='submit' variant="primary" id="button-addon2">
           Send
         </Button>
       </InputGroup>
