@@ -3,6 +3,7 @@ import { instrument } from '@socket.io/admin-ui';
 import { Namespace, Server, Socket as SocketType } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { LobbyLogic } from 'libs/core-components/src/lib/lobby/serverLogic';
+import { ServerLogic as ngLogic } from 'libs/game/number-game/src/lib/serverLogic'
 
 const io = new Server(3000, {
   cors: {
@@ -32,7 +33,7 @@ const Games: gameMapProps[] = [
   {name: 'lobby', logic: LobbyLogic},
   {name: 'area', logic: null},
   {name: 'stellcon', logic: null},
-  {name: 'number-game', logic: null},
+  {name: 'number-game', logic: ngLogic},
 ]
 
 let users: User[] = [];
