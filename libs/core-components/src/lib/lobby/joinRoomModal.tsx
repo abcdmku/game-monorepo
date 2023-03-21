@@ -38,7 +38,6 @@ export const JoinRoomModal = ({
   const getRooms = () => socket?.emit('getRooms', game)
 
   useEffect(() => {
-    console.log(game)
     const socket = useSocket({
       user: user,
       nameSpace: game,

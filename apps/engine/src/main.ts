@@ -113,14 +113,13 @@ Games.map(gameInfo =>{
         const message: Message = {room: r, name: 'System', message: `${user.name} left room ${r} for ${game.name}`}
         messages.unshift(message);
         
-        game.emit('message', messages);
-        game.emit('users', await getRoomUsers(game, r))
+        game.to(r).emit('message', messages.filter(m => m.room === r));
+        game.to(r).emit('users', await getRoomUsers(game, r))
       })
     });
 
     socket.on(('joinRoom'), async ({room = randomString(4), joinAsPlayer}, callback) => {
       const roomUsers = await getRoomUsers(game, room)
-      console.log('roomUsers', roomUsers)
         const joinedBefore = roomUsers.some(r => r.name === socket.data.user.name);
 
         if(joinAsPlayer) {
@@ -131,8 +130,7 @@ Games.map(gameInfo =>{
         socket.join(room);
         const message: Message = {room: room, name: 'System', message: `${user.name} joining room ${room} for ${game.name}`}
         messages.unshift(message);
-        console.log(message.message, 'joinedBefore', joinedBefore)
-        game.to(room).emit('message', messages);
+        game.to(room).emit('message',  messages.filter(m => m.room === room));
         game.to(room).emit('users', await getRoomUsers(game, room))
         callback(room);
 
@@ -141,7 +139,7 @@ Games.map(gameInfo =>{
     socket.on("message", async ({room = '', message: incomingMsg}) => {
       const message: Message = {room: room, name:user.name, message: incomingMsg}
       messages.unshift(message);
-      game.to(room).emit('message', messages);
+      game.to(room).emit('message',  messages.filter(m => m.room === room));
       game.to(room).emit('users', await getRoomUsers(game, room))
 
     });

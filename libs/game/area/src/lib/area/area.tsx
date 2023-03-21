@@ -16,7 +16,6 @@ export function Area({ user }: { user: User }) {
       const socket = io('http://localhost:3000/area', {query: { user: user }});
       setSocket(socket);
     }
-    console.log(room)
   }, []);
 
   const clientLogic = (socket:Socket) => {

@@ -29,7 +29,7 @@ export const JoinLobby = ({ onLogin}: { onLogin: (x: User) => void }) => {
       <div className='d-flex align-items-center' style={{ height: '100vh', overflow: 'hidden' }}>
         <Form className="m-auto" onSubmit={(e) => userName !== '' && handleLogin(e, userName)}>
           <h6 className={`ms-2 ${isConnected ? 'text-success' : 'text-danger'}`}>Connected: {String(isConnected)}</h6>
-          <InputGroup onSubmit={(e) => console.log(e)}>
+          <InputGroup>
             <Form.Control
               style={{ maxWidth: '200px' }}
               placeholder="username"

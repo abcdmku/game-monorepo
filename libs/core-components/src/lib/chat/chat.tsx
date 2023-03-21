@@ -17,7 +17,7 @@ export const Chat = ({userName, socket, room}:{userName:string; socket: Socket, 
   ]);
   
   useEffect(() => {
-      socket.on('users', (users:User[]) => (console.log(users), setUsers(users)));
+      socket.on('users', (users:User[]) => setUsers(users));
       socket.on('message', (msgs) => setMessages(msgs));
       socket.on("connect_error", (err) => {
         console.log(err instanceof Error);
