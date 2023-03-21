@@ -4,6 +4,7 @@ import { Modal, Stack, Button, ModalProps } from 'react-bootstrap';
 import { Socket } from 'socket.io-client';
 import { RoomRow } from './roomRow';
 import { RoomData } from './serverLogic';
+import { useNavigate } from 'react-router-dom';
 
 interface JoinRoomModalProps extends ModalProps {
   game: string;
@@ -18,19 +19,22 @@ export const JoinRoomModal = ({
   const [socket, setSocket] = useState<Socket>();
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  
+  const navigate = useNavigate();
+  const randomString = (int) => Array.from(Array(int), () => Math.floor(Math.random() * 36).toString(36)).join('');
+
   const clientLogic = (socket:Socket) => {
-    socket.on('rooms', (r) => (setRooms(r), console.log(r)));
+    socket.on('rooms', (rooms:RoomData[]) => (setRooms(rooms.filter(r => r.name.length === 4))));
     socket.on('connect', () => { setIsConnected(true); });
     socket.on('disconnect', () => { setIsConnected(false) });
   }
 
   interface joinRoomProps {
-    room?: null | string;
+    room?: string;
     joinAsPlayer?: boolean;
   }
 
-  const joinRoom = ({room = null, joinAsPlayer}:joinRoomProps) => socket?.emit('joinRoom', {room: room, joinAsPlayer: joinAsPlayer})
+  const joinRoom = ({room, joinAsPlayer}:joinRoomProps) => navigate(`/area/${room ? room : randomString(4)}${joinAsPlayer ? '' : '?watching=true'}`)
+
   const getRooms = () => socket?.emit('getRooms', game)
 
   useEffect(() => {
@@ -46,7 +50,6 @@ export const JoinRoomModal = ({
     return () => {
       socket.off('connect');
       socket.off('disconnect');
-      socket.off('pong');
     };
   }, [game]);
 
@@ -59,7 +62,7 @@ export const JoinRoomModal = ({
         <Stack gap={1}>
           {rooms?.length ? 
           rooms.map(r => (
-            <RoomRow roomData={r}/>
+            <RoomRow roomData={r} onJoin={joinAsPlayer => joinRoom({room: r.name, joinAsPlayer: joinAsPlayer})}/>
           )) :
           <div>Be the first to make a room!</div>
         }

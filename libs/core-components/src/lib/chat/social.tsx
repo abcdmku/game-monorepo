@@ -6,7 +6,7 @@ import { MessageInput } from "./messageInput";
 import { UserList } from "./userList";
 
 interface SocialProps extends ChatProps {
-    users: User[];
+    users: Omit<User, "id">[];
     onSend: (x: string) => void 
   }
     

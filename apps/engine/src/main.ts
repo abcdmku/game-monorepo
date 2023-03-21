@@ -19,7 +19,7 @@ export type Game = Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMa
 export type Socket = SocketType<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 
 const randomString = (int) => Array.from(Array(int), () => Math.floor(Math.random() * 36).toString(36)).join('');
-
+const omit = (obj, keys) => Object.keys(obj).filter((k) => !keys.includes(k)).reduce((res, k) => Object.assign(res, { [k]: obj[k] }), {});
 type gameLogicProps = (game: Game, socket: Socket, io?: ServerIO) => void
 
 interface gameMapProps { 
@@ -60,7 +60,7 @@ const getRoomData = async (game:Game) => {
       game.in(roomName).fetchSockets().then(async sockets => {
         sockets.forEach(async s => {
           const isPlayer = s.data.playing?.includes(roomName);
-          isPlayer ? players.push(s.data.userName) : watchers.push(s.data.userName);
+          isPlayer ? players.push(s.data.user.name) : watchers.push(s.data.user.name);
         })
       })
       rooms.push({ name: roomName, players: players, watchers: watchers });
@@ -69,11 +69,18 @@ const getRoomData = async (game:Game) => {
   return rooms;
 }
 
+const getRoomUsers = async (game:Game, room: string) => {
+  const users:User[] = [];
+  await game.in(room).fetchSockets().then(sockets => 
+    sockets.forEach(s =>users.push(omit(s.data.user,['token']) as User))
+  )
+  return users
+}
+
 Games.map(gameInfo =>{
   const game = io.of(gameInfo.name);
 
   let messages: Message[] = [];
-  let nsUsers: string[] = [];
   
   game.use((socket, next) => {
     const requestedUser = socket.handshake.auth as User;
@@ -87,41 +94,53 @@ Games.map(gameInfo =>{
       socket.data.user = user
       users.push(user);
     }
-    game.emit('users', nsUsers)
     next();
   });
 
   game.on('connection', async (socket) => {
     const user = socket.data.user as User;
-      game.emit('joined', user)
-      game.emit('rooms', await getRoomData(game));
+    
+    game.emit('joined', user)
 
-      socket.on("disconnect", () => {
-        users = users.filter(u => u.name !== user.name)
-      });
+    game.emit('rooms', await getRoomData(game));
 
-      socket.on(('joinRoom'), async ({room = randomString(4), joinAsPlayer}) => {
+    socket.on("disconnect",  () => {
+      socket.data.playing?.forEach(async (r) => {
+        const message: Message = {room: r, name: 'System', message: `${user.name} left room ${r} for ${game.name}`}
+        messages.unshift(message);
+        //game.emit('message', messages);
+        //game.emit('users', await getRoomUsers(game, r))
+      })
+    });
+
+    socket.on(('joinRoom'), async ({room = randomString(4), joinAsPlayer}, callback) => {
+      const roomUsers = await getRoomUsers(game, room)
+      console.log('roomUsers', roomUsers)
+        const joinedBefore = roomUsers.some(r => r.name === socket.data.user.name);
+
         if(joinAsPlayer) {
           const roomsAsPlayer = socket.data.playing?.length ? socket.data.playing : []
           socket.data.playing = [...roomsAsPlayer, room]
         }
 
         socket.join(room);
-
         const message: Message = {room: room, name: 'System', message: `${user.name} joining room ${room} for ${game.name}`}
         messages.unshift(message);
-        console.log(message)
-
+        console.log(message.message, 'joinedBefore', joinedBefore)
         game.to(room).emit('message', messages);
+        game.to(room).emit('users', await getRoomUsers(game, room))
+        callback(room);
 
-      });
+    });
 
-      socket.on("message", ({room = '', message: incomingMsg}) => {
-        const message: Message = {room: room, name:user.name, message: incomingMsg}
-        messages.unshift(message);
-        game.to(room).emit('message', messages.filter(m => m.room === room))
-      });
+    socket.on("message", async ({room = '', message: incomingMsg}) => {
+      const message: Message = {room: room, name:user.name, message: incomingMsg}
+      messages.unshift(message);
+      game.to(room).emit('message', messages);
+      game.to(room).emit('users', await getRoomUsers(game, room))
 
-      if (gameInfo.logic) game.name === 'lobby' ? gameInfo.logic(game, socket, io) : gameInfo.logic(game, socket); 
+    });
+
+    if (gameInfo.logic) game.name === 'lobby' ? gameInfo.logic(game, socket, io) : gameInfo.logic(game, socket); 
   })
 })

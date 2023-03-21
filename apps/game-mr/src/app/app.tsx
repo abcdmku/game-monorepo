@@ -8,14 +8,31 @@ import { JoinRoomModal } from 'libs/core-components/src/lib/lobby/joinRoomModal'
 
 export function App() {
   const [user, setUser] = useState<User>({} as User);
-
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const rawUser = sessionStorage?.user
+    if(rawUser) {
+      const user = rawUser && JSON.parse(rawUser) as User;
+      user.token && setUser(user)
+    }
+  }, []);
+
+  const handleLogin = (user: User) => {
+    sessionStorage.setItem("user", JSON.stringify(user));
+    setUser(user);
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser({} as User);
+  }
+
   return user && user?.name === undefined ? (
-      <JoinLobby onLogin={(u) => setUser( u as User)}/>
+      <JoinLobby onLogin={u => handleLogin(u)}/>
     ) : (
       <div style={{ height: '100vh', overflow: 'hidden' }}>
-        <Button className='position-absolute top-0 end-0 m-3' onClick={(u) => setUser({} as User)}>Log out</Button>
+        <Button className='position-absolute top-0 end-0 m-3' onClick={() => handleLogout()}>Log out</Button>
         <Routes>
           <Route path="/" element={<Lobby user={user as User}/>}/>
           <Route path="/area/*" element={<Area user={user as User}/>}/>

@@ -8,7 +8,7 @@ export const JoinLobby = ({ onLogin}: { onLogin: (x: User) => void }) => {
     const [isConnected, setIsConnected] = useState(false);
     
     const clientLogic = (socket:Socket) => {
-      socket.on('joined', (u) => { onLogin(u); });
+      socket.on('joined', (u) => { onLogin(u) });
       socket.on('disconnect', () => { setIsConnected(false) });
       socket.on("connect_error", (err) => {
         console.log(err instanceof Error);
@@ -19,7 +19,6 @@ export const JoinLobby = ({ onLogin}: { onLogin: (x: User) => void }) => {
 
     const handleLogin = (e, userName) => {
       e.preventDefault();
-
       const socket = useSocket({
         user: {name: userName},
         nameSpace: '',

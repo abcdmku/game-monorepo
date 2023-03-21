@@ -26,6 +26,9 @@ export function Lobby({user}:{user:User}) {
       logic: (socket) => clientLogic(socket)
     })
     setSocket(socket)
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const navigate = useNavigate();

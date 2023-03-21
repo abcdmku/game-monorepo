@@ -22,6 +22,7 @@ export function Area({ user }: { user: User }) {
   const clientLogic = (socket:Socket) => {
     socket.on('connect', () => { setIsConnected(true); });
     socket.on('disconnect', () => { setIsConnected(false) });
+    socket.emit('joinRoom', {room: room, joinAsPlayer: true}, (r) => console.log('joined', r));
   }
 
   useEffect(() => {
@@ -33,10 +34,6 @@ export function Area({ user }: { user: User }) {
     setSocket(socket)
   }, []);
 
-  useEffect(() => {
-    socket?.emit('joinRoom', { joinAsPlayer: true});
-  }, [room]);
-
   return (
     <div style={{ height: '100vh', overflow: 'hidden' }}>
       <h1 className="text-center mt-3">Welcome to Area!</h1>
@@ -45,6 +42,7 @@ export function Area({ user }: { user: User }) {
       ) : (
         <div>
           <div className="fixed-bottom">
+            <h6 className={`ms-2 ${isConnected ? 'text-success' : 'text-danger'}`}>Connected: {String(isConnected)}</h6>
             <Chat userName={user.name} socket={socket} room={room}/>
           </div>
         </div>

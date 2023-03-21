@@ -17,8 +17,8 @@ export const Chat = ({userName, socket, room}:{userName:string; socket: Socket, 
   ]);
   
   useEffect(() => {
-      socket.on('users', (u) => { setUsers(u); });
-      socket.on('message', (u) => { setMessages(u); });
+      socket.on('users', (users:User[]) => (console.log(users), setUsers(users)));
+      socket.on('message', (msgs) => setMessages(msgs));
       socket.on("connect_error", (err) => {
         console.log(err instanceof Error);
         console.log(err.message);
@@ -28,15 +28,14 @@ export const Chat = ({userName, socket, room}:{userName:string; socket: Socket, 
         socket.off('users');
         socket.off('message');
         socket.off('connect_error');
+        
       };
   }, []);
 
-  return <>
-    <Social
-      users={users}
-      currentUserName={`${userName}`}
-      onSend={(msg) => socket?.emit('message', {room: room, message:msg})}
-      messages={messages}
-    />
-  </>
+  return <Social
+    users={users}
+    currentUserName={`${userName}`}
+    onSend={(msg) => socket?.emit('message', {room: room, message:msg})}
+    messages={messages}
+  />
 }
