@@ -23,7 +23,7 @@ function GuessTable({guesses}: guessTableProps ) {
       </tr>
     </thead>
     <tbody>
-    {guesses.map(data => (
+    {guesses?.map(data => (
       <tr key={data.guess}>
         <td>{data.guess}</td>
         <td>{data.p}</td>

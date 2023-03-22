@@ -43,7 +43,7 @@ export const NumberGame = ({ user }: { user: User }) => {
         <div> Joining room...</div>
       ) : (
         <>
-          <Game/>
+          <Game user={user} socket={socket} room={room}/>
           <div className="fixed-bottom">
             <h6 className={`ms-2 ${isConnected ? 'text-success' : 'text-danger'}`}>Connected: {String(isConnected)}</h6>
             <Chat userName={user.name} socket={socket} room={room}/>
