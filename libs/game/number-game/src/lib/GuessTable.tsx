@@ -1,18 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Table } from 'react-bootstrap';
+import { guess } from './helpers';
 
 
-export interface guessProps {
-  guess:string;
-  p: number;
-  n: number;
-}
 
 export interface guessTableProps {
-  guesses:guessProps[];
+  guesses:guess[];
 }
 
 function GuessTable({guesses}: guessTableProps ) {
+  useEffect(() => {
+    console.log(guesses)
+  }, []);
+  
   return (
     <Table striped bordered hover className="mt-3">
     <thead>
@@ -23,8 +23,8 @@ function GuessTable({guesses}: guessTableProps ) {
       </tr>
     </thead>
     <tbody>
-    {guesses?.map(data => (
-      <tr key={data.guess}>
+    {guesses?.map((data, i) => (
+      <tr key={i}>
         <td>{data.guess}</td>
         <td>{data.p}</td>
         <td>{data.n}</td>
