@@ -7,7 +7,7 @@ import { ServerLogic as ngLogic } from 'libs/game/number-game/src/lib/serverLogi
 
 const io = new Server(3000, {
   cors: {
-    origin: [/(localhost)./, /(minerva.us)/, "https://admin.socket.io", /()/],
+    origin: [/(localhost)./, /(minerva.us)/, /(ravenwood.io)/, "https://admin.socket.io", /()/],
     credentials: true
   },
 });
