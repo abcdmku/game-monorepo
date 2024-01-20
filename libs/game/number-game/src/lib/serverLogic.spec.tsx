@@ -74,4 +74,14 @@ describe('serverState', () => {
     testState.deleteRoom('room2')
     expect(testState.roomData['room2']).toBe(undefined);
   });
+
+  it('switchTurns should update room1 turn', () => {
+    testState.roomData['room1'].turn = 1
+    testState.switchTurns('room1')
+    expect(testState.roomData['room1'].turn).toBe(2);
+    testState.switchTurns('room1')
+    expect(testState.roomData['room1'].turn).toBe(1);
+    testState.switchTurns('room1')
+    expect(testState.roomData['room1'].turn).toBe(2);
+  });
 });

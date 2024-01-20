@@ -24,4 +24,4 @@ Visit the [Nx Documentation](https://nx.dev) to learn more.
 Theme docs https://bootswatch.com/vapor/
 Icon docs https://react-icons.github.io/react-icons/search?q=eye
 socket.io docs https://socket.io/docs/v4/
-socket.io admin panel (use http://localhost3000) https://admin.socket.io/#/events
+socket.io admin panel (use http://engine.ravenwood.io) https://admin.socket.io/#/events

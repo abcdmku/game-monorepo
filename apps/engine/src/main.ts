@@ -4,6 +4,7 @@ import { Namespace, Server, Socket as SocketType } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { LobbyLogic } from 'libs/core-components/src/lib/lobby/serverLogic';
 import { ServerLogic as ngLogic } from 'libs/game/number-game/src/lib/serverLogic'
+var https = require('https');
 
 const io = new Server(3000, {
   cors: {

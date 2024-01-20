@@ -11,7 +11,8 @@ export const serverState = {
   setRoomState (room: string, state: gameState) { this.roomData[room].state = state},
   getPlayerNumber (room: string, player: User) { return playerNumber(this.roomData[room].players, player)},
   setPlayerNumber (room: string, player: User, number: string) {this.roomData[room].players[this.getPlayerNumber(room, player)].number = number}, 
-  playersAddedNumbers (room: string) { let numbersAdded = 0; Object.values(this.roomData[room].players).map((v:any) => v.number !== '' && numbersAdded++); return numbersAdded === this.roomData[room].maxPlayers}
+  playersAddedNumbers (room: string) { let numbersAdded = 0; Object.values(this.roomData[room].players).map((v:any) => v.number !== '' && numbersAdded++); return numbersAdded === this.roomData[room].maxPlayers},
+  switchTurns (room: string) { this.roomData[room].turn = ((this.roomData[room].turn) % this.roomData[room].maxPlayers) + 1}
 }
 
 export const ServerLogic = (game:Game, socket:ServerSocket) => {
@@ -21,7 +22,6 @@ export const ServerLogic = (game:Game, socket:ServerSocket) => {
 
   socket.on('joinedRoom', (data) => {
     serverState.initRoom(data.room);
-    console.log(roomInitState)
     const playerAdded = serverState.addUser(data.room, data.player)
     playerAdded === serverState.roomData[data.room].maxPlayers && serverState.setRoomState(data.room, gameState.initalizing)
     playerAdded 
@@ -29,25 +29,21 @@ export const ServerLogic = (game:Game, socket:ServerSocket) => {
       : socket.emit('roomData', serverState.roomData[data.room]);
   });
 
-  socket.on('setNumber', (data) => {
+  socket.on('setNumber', (data, callback) => {
     if(!validGuess(data.number)) {game.to(socket.id).emit('guessError', 'Number must be 5 unique digits'); return}
     serverState.setPlayerNumber(data.room, data.player, data.number)
     if(serverState.playersAddedNumbers(data.room)) {
       serverState.setRoomState(data.room, gameState.playing);
       game.to(data.room).emit('roomData', serverState.roomData[data.room]);
-    }
+    } else callback('waiting')
   });
 
   socket.on('guess', (data, callback) => {
     if(!validGuess(data.guess)) {game.to(socket.id).emit('guessError', 'Guess must be 5 unique numbers'); return}
     if(dupeCheck(data.guess, serverState.getPlayerGuesses(data.room, data.player))) {game.to(socket.id).emit('guessError', 'You guessed that already'); return}
-
     serverState.addGuess(data.room, data.player, numcheck('12345', data.guess))
-
     game.to(data.room).emit('roomData', serverState.roomData[data.room]);
     callback(data);
     socket.emit('serverState', serverState);
-
   });
-
 }

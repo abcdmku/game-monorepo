@@ -13,7 +13,7 @@ export function Area({ user }: { user: User }) {
 
   useEffect(() => {
     if (!socket) {
-      const socket = io('http://localhost:3000/area', {query: { user: user }});
+      const socket = io('https://engine.ravenwood.io/area', {query: { user: user }});
       setSocket(socket);
     }
   }, []);

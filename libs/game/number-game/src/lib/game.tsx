@@ -17,7 +17,8 @@ export const Game = ({user, socket, room}:gameProps) => {
   const [roomData, setRoomData] = useState<roomDataProps>({} as roomDataProps);
   const [guess, setGuess] = useState('');
   const [invalid, setInvalid] = useState('');
-  const [currentPlayerNum, setCurrentPlayerNum] = useState(1);
+  const [currentPlayerNum, setCurrentPlayerNum] = useState(0);
+  const [numberSubmitted, setNumberSubmitted] = useState(false);
 
   useEffect(() => {
     socket.on('serverState', (d) => { console.log(d) });
@@ -56,21 +57,27 @@ export const Game = ({user, socket, room}:gameProps) => {
     if(!valid) { setInvalid('Number must be 5 unique digits'); return }
 
     setInvalid('')
-    socket.emit('setNumber', {room: room, player: user, number: number}, (r) => console.log('guess res:', r))
+    socket.emit('setNumber', {room: room, player: user, number: number}, (r) => setNumberSubmitted(true))
     e.currentTarget.reset()
     setGuess('')
   };
 
   return (
     <>
-    <Row className="ps-3"><h2 className="p-2">Status: {gameState[roomData.state]}</h2></Row>
       <div className="d-flex w-100 h-75">
       <Row className="m-auto" style={{maxWidth: '900px'}}>
-        {(()=>{switch (roomData.state) {
+        {
+currentPlayerNum === 0 ?  roomData.state > 1 ?<>
+  <GuessTable guesses={roomData.players[1]?.guesses as guess[] || []}/>
+  <GuessTable guesses={roomData.players[2]?.guesses as guess[] || []}/>
+  </> : <h1 className='text-info loading'>Waiting for players to set their number</h1>
+:
+        (()=>{
+          switch (roomData.state) {
           case gameState.open:
             return <h1 className='text-info loading'>Waiting for players to join</h1>      
           case gameState.initalizing:
-            return (
+            return !numberSubmitted ? (
               <Form onSubmit={e => (e.preventDefault(), guess && handleSetNumber(guess, e))}>
                 <InputGroup>
                   <Form.Control placeholder="Your Number" onChange={e => (setGuess(e.currentTarget.value), setInvalid(''))}/>
@@ -80,7 +87,7 @@ export const Game = ({user, socket, room}:gameProps) => {
                   {invalid}
                 </div>
               </Form>
-            )
+            ) : <h1 className='text-info loading'>Waiting for opponent to set their number</h1>
           case gameState.playing || gameState.finished:
             return ( <>
               <Col style={{minWidth: '300px'}}><NumberTable className="mx-auto"/></Col>

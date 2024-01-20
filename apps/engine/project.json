@@ -13,7 +13,8 @@
         "outputPath": "dist/apps/engine",
         "main": "apps/engine/src/main.ts",
         "tsConfig": "apps/engine/tsconfig.app.json",
-        "assets": ["apps/engine/src/assets"]
+        "assets": ["apps/engine/src/assets"],
+        "generatePackageJson": true
       },
       "configurations": {
         "production": {

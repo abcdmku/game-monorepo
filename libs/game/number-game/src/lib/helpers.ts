@@ -1,5 +1,6 @@
 import { User } from "@game-mr/helpers";
 
+export const randomInt = (min, max) => Math.floor(Math.random() * (Math.floor(max) -  Math.ceil(min) + 1)) + Math.ceil(min);
 export const validGuess = (guess:string) => /^(\d)(?!.*\1)(\d)(?!.*\2)(\d)(?!.*\3)(\d)(?!.*\4)\d$/.test(guess)
 export const dupeCheck = (guess: string, guesses: string[]) => guesses.some(g => g === guess)
 export const numcheck = (number, guess) => {
@@ -34,7 +35,7 @@ export interface roomDataProps {
 export const roomInitState = {
   players: {},
   maxPlayers: 2,
-  turn: 2,
+  turn: randomInt(1,2),
   state: 0
 } as roomDataProps;
 

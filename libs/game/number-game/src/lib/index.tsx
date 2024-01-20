@@ -15,7 +15,7 @@ export const NumberGame = ({ user }: { user: User }) => {
 
   useEffect(() => {
     if (!socket) {
-      const socket = io('http://localhost:3000/number-game', {query: { user: user }});
+      const socket = io('https://engine.ravenwood.io/number-game', {query: { user: user }});
       setSocket(socket);
     }
     console.log(room)

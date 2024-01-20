@@ -33,6 +33,7 @@ export function App() {
       <JoinLobby onLogin={u => handleLogin(u)}/>
     ) : (
       <div style={{ height: '100vh', overflow: 'hidden' }}>
+        <a className='position-absolute top-0 start-0 m-3 h3 text-primary text-decoration-none' href='/'>ravenwood.io</a>
         <Button className='position-absolute top-0 end-0 m-3' onClick={() => handleLogout()}>Log out {user.name}</Button>
         <Routes>
           <Route path="/" element={<Lobby user={user as User}/>}/>
