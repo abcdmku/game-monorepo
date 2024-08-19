@@ -1,5 +1,5 @@
 import { ServerSocket, Game, User } from "@game-mr/helpers";
-import { validGuess, roomDataProps, roomInitState, numcheck, dupeCheck, gameState, playerNumber, guess, playerInitState } from "./helpers";
+import { validGuess, roomDataProps, roomInitState, numCheck, dupeCheck, gameState, playerNumber, guess, playerInitState } from "./helpers";
 
 export const serverState = {
   roomData: <{[x:string]:roomDataProps}> {},
@@ -12,7 +12,7 @@ export const serverState = {
   getPlayerNumber (room: string, player: User) { return playerNumber(this.roomData[room].players, player)},
   setPlayerNumber (room: string, player: User, number: string) {this.roomData[room].players[this.getPlayerNumber(room, player)].number = number}, 
   playersAddedNumbers (room: string) { let numbersAdded = 0; Object.values(this.roomData[room].players).map((v:any) => v.number !== '' && numbersAdded++); return numbersAdded === this.roomData[room].maxPlayers},
-  switchTurns (room: string) { this.roomData[room].turn = ((this.roomData[room].turn) % this.roomData[room].maxPlayers) + 1}
+  switchTurns (room: string) { this.roomData[room].turn = (this.roomData[room].turn % this.roomData[room].maxPlayers) + 1}
 }
 
 export const ServerLogic = (game:Game, socket:ServerSocket) => {
@@ -41,9 +41,10 @@ export const ServerLogic = (game:Game, socket:ServerSocket) => {
   socket.on('guess', (data, callback) => {
     if(!validGuess(data.guess)) {game.to(socket.id).emit('guessError', 'Guess must be 5 unique numbers'); return}
     if(dupeCheck(data.guess, serverState.getPlayerGuesses(data.room, data.player))) {game.to(socket.id).emit('guessError', 'You guessed that already'); return}
-    serverState.addGuess(data.room, data.player, numcheck('12345', data.guess))
+    serverState.addGuess(data.room, data.player, numCheck('12345', data.guess))
     game.to(data.room).emit('roomData', serverState.roomData[data.room]);
     callback(data);
+    serverState.switchTurns(data.room);
     socket.emit('serverState', serverState);
   });
 }
